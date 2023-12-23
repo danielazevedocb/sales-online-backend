@@ -4,6 +4,7 @@ import { UserEntity } from './entities/user.entity';
 import { hash } from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { retryWhen } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,15 @@ export class UserService {
       ...createUserDto,
       typeUser: 1,
       password: passwordHashed,
+    });
+  }
+
+  async getUserByIdUsingRelations(userId: number): Promise<UserEntity> {
+    return this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      relations: ['addresses'],
     });
   }
 
